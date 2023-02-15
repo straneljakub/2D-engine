@@ -11,7 +11,7 @@ namespace SDL_2_Test.engine
     public class Draw
     {
         // Fonts
-        public static IntPtr Arial = SDL_ttf.TTF_OpenFont(Path.Combine(AppContext.BaseDirectory, "arial.ttf"), 26);
+        public static IntPtr Arial = SDL2.SDL_ttf.TTF_OpenFont(Path.Combine(AppContext.BaseDirectory, "arial.ttf"), 26);
         // SDL Colors
         public static SDL.SDL_Color Black = new SDL.SDL_Color() { r = 0, g = 0, b = 0, a = 255 };
         // Fps texture creation

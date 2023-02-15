@@ -105,6 +105,16 @@ namespace SDL_2_Test.engine
     {
         public bool MoveableObject;
     }
+
+    public class SpriteComponent : Component
+    {
+        public int assetsIndex;
+        public int spriteWidth;
+        public int spriteHeight;
+        public int spriteRow;
+        public int spriteCol;
+    }
+
     #endregion
 
     #region Entities
