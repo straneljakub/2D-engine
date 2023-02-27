@@ -10,6 +10,6 @@ namespace SDL_2_Test.engine
 {
     public static class Assets
     {
-       
+        
     }
 }
