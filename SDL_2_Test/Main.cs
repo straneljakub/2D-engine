@@ -17,13 +17,29 @@ namespace SDL_2_Test
                 if (keyArray[(int)SDL.SDL_Scancode.SDL_SCANCODE_RIGHT] == 1 && keyArray[(int)SDL.SDL_Scancode.SDL_SCANCODE_LEFT] == 1)
                     ;
                 else if (keyArray[(int)SDL.SDL_Scancode.SDL_SCANCODE_LEFT] == 1 && isGrounded)
+                {
                     x -= (float)(Variables.PlayerSpeed * elapsed);
+                    entity.SetFacing(0);
+                }
+                    
                 else if (keyArray[(int)SDL.SDL_Scancode.SDL_SCANCODE_RIGHT] == 1 && isGrounded)
+                {
                     x += (float)(Variables.PlayerSpeed * elapsed);
+                    entity.SetFacing(1);
+                }
+                    
                 else if (keyArray[(int)SDL.SDL_Scancode.SDL_SCANCODE_LEFT] == 1)
+                {
                     x -= (float)(Variables.PlayerSpeedAir * elapsed);
+                    entity.SetFacing(0);
+                }
+                    
                 else if (keyArray[(int)SDL.SDL_Scancode.SDL_SCANCODE_RIGHT] == 1)
+                {
                     x += (float)(Variables.PlayerSpeedAir * elapsed);
+                    entity.SetFacing(1);
+                }
+                    
 
 
                 //jump
@@ -78,6 +94,35 @@ namespace SDL_2_Test
             }
 
             return false;
+        }
+
+        public static void Animations(double elapsed)
+        {
+            var player = EntityManager.GetPlayer();
+            var arr = Variables.KeyArray;
+            var grounded = player.Grounded();
+            SpriteComponent sc = player.GetComponent<SpriteComponent>();
+
+            if(!grounded)
+            {
+                sc.spriteRow = 18;
+                sc.spriteCol = (int)(SDL.SDL_GetTicks() / sc.speed) % 6;
+                player.SetSprite(sc);
+            }
+            else if (grounded && (arr[(int)SDL.SDL_Scancode.SDL_SCANCODE_LEFT] == 1 || arr[(int)SDL.SDL_Scancode.SDL_SCANCODE_RIGHT] == 1))
+            {
+                sc.spriteRow = 2;
+                sc.spriteCol = (int)(SDL.SDL_GetTicks() / sc.speed) % 8;
+                player.SetSprite(sc);
+            }
+            else
+            {
+                sc.spriteRow = 0;
+                sc.spriteCol = (int)(SDL.SDL_GetTicks() / sc.speed) % 8;
+                player.SetSprite(sc);
+            }
+            
+            
         }
     }
 }

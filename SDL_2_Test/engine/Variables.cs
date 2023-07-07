@@ -9,7 +9,7 @@ namespace SDL_2_Test.engine
 {
     public static class Variables
     {
-        public readonly static int ScreenWidth = 600;
+        public readonly static int ScreenWidth = 1000;
         public readonly static int ScreenHeight = 600;
         public readonly static int LevelWidth = 1000;
         public readonly static int LevelHeight = 600;

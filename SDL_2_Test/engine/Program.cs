@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
+
 namespace SDL_2_Test.engine
 {
     class Program
@@ -42,6 +43,7 @@ namespace SDL_2_Test.engine
                 Marshal.Copy(state, Variables.KeyArray, 0, size);
                 Physics.Update(elapsed);
                 Camera.Update();
+                Assets.Animate(elapsed);
                 Render();
                 // Main Game Loop Functions End
 
@@ -89,38 +91,6 @@ namespace SDL_2_Test.engine
             /// </summary>
             void Setup()
             {
-                // Player init
-                Variables.Entities.Add(new Player());
-
-                // Obstacles init
-
-                for (int i = 0; i < 1; i++)
-                {
-                    var obstacle = new Obstacle();
-                    Variables.Entities.Add(obstacle);
-                }
-
-
-                var obs = new Obstacle();
-                obs.SetHitbox(300, -300);
-                Variables.Entities.Add(obs);
-
-                var os = new Obstacle();
-                os.SetHitbox(150, -150);
-                Variables.Entities.Add(os);
-
-
-                // Fruit init
-
-                for (int i = 0; i < 40; i++)
-                {
-                    var fruit = new Fruit();
-                    Variables.Entities.Add(fruit);
-                }
-
-
-
-
                 // Initilizes SDL.
                 if (SDL.SDL_Init(SDL.SDL_INIT_VIDEO) < 0)
                 {
@@ -160,8 +130,54 @@ namespace SDL_2_Test.engine
                     Console.WriteLine($"There was an issue creating the renderer. {SDL.SDL_GetError()}");
                 }
 
+                var flags = SDL_image.IMG_InitFlags.IMG_INIT_PNG | SDL_image.IMG_InitFlags.IMG_INIT_JPG;
+                if (SDL_image.IMG_Init(flags) < 0)
+                {
+                    Console.WriteLine($"There was an issue initializing SDL_image. {SDL.SDL_GetError()}");
+                }
 
                 SDL.SDL_SetRenderDrawBlendMode(Variables.Renderer, SDL.SDL_BlendMode.SDL_BLENDMODE_BLEND);
+
+
+                
+
+                // Obstacles init
+                int index = Assets.AddAsset("./assets/grass.png");
+                var obs = new Obstacle(index, 0, Variables.LevelHeight - 50, 50, Variables.LevelWidth);
+                Variables.Entities.Add(obs);
+
+                obs = new Obstacle(index, 130, Variables.LevelHeight - 200, 50, 400);
+                Variables.Entities.Add(obs);
+
+                obs = new Obstacle(index, 300, Variables.LevelHeight - 400, 50, 400);
+                Variables.Entities.Add(obs);
+
+                index = Assets.AddAsset("./assets/ker.png");
+                var tree = new Texture(index, 120, Variables.LevelHeight - 400, 200, 200);
+                Variables.Entities.Add(tree);
+
+                tree = new Texture(index, 600, Variables.LevelHeight - 250, 200, 200);
+                Variables.Entities.Add(tree);
+
+                index = Assets.AddAsset("./assets/wall.jpg");
+                var wall1 = new Obstacle(index, 0, 0, Variables.LevelHeight - 50, 30);
+                Variables.Entities.Add(wall1);
+
+
+                var wall2 = new Obstacle(index, Variables.LevelWidth - 30, 0, Variables.LevelHeight - 50, 30);
+                Variables.Entities.Add(wall2);
+
+
+
+                // Fruit init
+                index = Assets.AddAsset("./assets/apple.png");
+                for (int i = 0; i < 40; i++)
+                {
+                    var fruit = new Fruit(index);
+                    Variables.Entities.Add(fruit);
+                }
+
+                Variables.Entities.Add(new Player(Assets.AddAsset("./assets/viking.png")));
             }
 
 
@@ -215,70 +231,84 @@ namespace SDL_2_Test.engine
                 // Clears the current render surface.
                 SDL.SDL_RenderClear(Variables.Renderer);
 
-
-                var color = new SDL.SDL_Color();
-
-
-                //Render obstacles
-                List<Entity> list = EntityManager.GetAll<Obstacle>();
-                foreach (Entity obstacle in list)
+                foreach(Entity entity in Variables.Entities)
                 {
-                    for (int j = 0; j < obstacle.GetShapesCount(); j++)
+                    if(entity.GetType()==typeof(Player))
                     {
-                        var shape = obstacle.GetShape()[j].Item1;
-                        shape.x -= Variables.Camera.x;
-                        shape.y -= Variables.Camera.y;
-                        color = obstacle.GetShape()[j].Item2;
-                        SDL.SDL_SetRenderDrawColor(Variables.Renderer, color.r, color.g, color.b, color.a);
-                        SDL.SDL_RenderFillRectF(Variables.Renderer, ref shape);
+                        continue;
+                    }
+                    var sc = entity.GetComponent<SpriteComponent>();
+                    var t = Assets.AssetsArray[sc.assetsIndex];
+                    var h = entity.GetHitbox();
+                    h.x -= Variables.Camera.x;
+                    h.y -= Variables.Camera.y;
+
+                    if(sc.animated)
+                    {
+                        SDL.SDL_Rect s = new SDL.SDL_Rect()
+                        {
+                            x = sc.spriteX + (sc.spriteCol * sc.spriteXDiff),
+                            y = sc.spriteY + (sc.spriteRow * sc.spriteYDiff),
+                            h = sc.spriteHeight,
+                            w = sc.spriteWidth,
+                        };
+                        if (entity.GetFacing() == 1)
+                        {
+                            SDL.SDL_RenderCopyF(Variables.Renderer, t, ref s, ref h);
+                        }
+                        else
+                        {
+                            SDL.SDL_RenderCopyExF(Variables.Renderer, t, ref s, ref h, 0, IntPtr.Zero, SDL.SDL_RendererFlip.SDL_FLIP_HORIZONTAL);
+                        }
+                    } else
+                    {
+                        SDL.SDL_RenderCopyF(Variables.Renderer, t, IntPtr.Zero, ref h);
                     }
                 }
 
-                // Render fruit
-                list = EntityManager.GetAll<Fruit>();
-                foreach (Entity fruit in list)
-                {
-                    for (int j = 0; j < fruit.GetShapesCount(); j++)
-                    {
-                        var shape = fruit.GetShape()[j].Item1;
-                        shape.x -= Variables.Camera.x;
-                        shape.y -= Variables.Camera.y;
-                        color = fruit.GetShape()[j].Item2;
-                        SDL.SDL_SetRenderDrawColor(Variables.Renderer, color.r, color.g, color.b, color.a);
-                        SDL.SDL_RenderFillRectF(Variables.Renderer, ref shape);
-                    }
-                }
 
-                // Render player
                 Entity player = EntityManager.GetPlayer();
-                SDL.SDL_SetRenderDrawColor(Variables.Renderer, color.r, color.g, color.b, color.a);
-                for (int i = 0; i < player.GetShapesCount(); i++)
+                SpriteComponent spriteComponent = player.GetComponent<SpriteComponent>();
+                var texture = Assets.AssetsArray[spriteComponent.assetsIndex];
+                SDL.SDL_FRect hitbox = player.GetHitbox();
+                SDL.SDL_Rect src = new SDL.SDL_Rect()
                 {
-                    var shape = player.GetShape()[i].Item1;
-                    shape.x -= Variables.Camera.x;
-                    shape.y -= Variables.Camera.y;
-                    color = player.GetShape()[i].Item2;
-                    SDL.SDL_SetRenderDrawColor(Variables.Renderer, color.r, color.g, color.b, color.a);
-                    SDL.SDL_RenderFillRectF(Variables.Renderer, ref shape);
-                }
+                    x = spriteComponent.spriteX + (spriteComponent.spriteCol * spriteComponent.spriteXDiff),
+                    y = spriteComponent.spriteY + (spriteComponent.spriteRow * spriteComponent.spriteYDiff),
+                    h = spriteComponent.spriteHeight,
+                    w = spriteComponent.spriteWidth,
+                };
 
-                // SDL.SDL_RenderFillRect(renderer, ref rect5test.rectangle);
-                // Switches out the currently presented render surface with the one we just did work on.
+                hitbox.x -= Variables.Camera.x;
+                hitbox.y -= Variables.Camera.y;
+                if (player.GetFacing() == 1)
+                {
+                    SDL.SDL_RenderCopyF(Variables.Renderer, texture, ref src, ref hitbox);
+                }
+                else
+                {
+                    SDL.SDL_RenderCopyExF(Variables.Renderer, texture, ref src, ref hitbox, 0, IntPtr.Zero, SDL.SDL_RendererFlip.SDL_FLIP_HORIZONTAL);
+                }
+                
+
 
                 // Draw fps to screen
                 Draw.DrawFps();
                 SDL.SDL_RenderPresent(Variables.Renderer);
 
+
             }
 
-            /// <summary>
-            /// Clean up the resources that were created.
-            /// </summary>
             void CleanUp()
             {
+                for(int i = 0; i < Assets.Index; i++)
+                {
+                    SDL.SDL_DestroyTexture(Assets.AssetsArray[i]);
+                }
                 SDL.SDL_DestroyRenderer(Variables.Renderer);
                 SDL.SDL_DestroyWindow(Variables.Window);
                 SDL.SDL_Quit();
+
             }
         }
     }

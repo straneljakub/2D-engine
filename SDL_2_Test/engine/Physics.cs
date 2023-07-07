@@ -100,7 +100,6 @@ namespace SDL_2_Test.engine
                 entity.SetForce(force);
             }
 
-
             double velocity = entity.GetVelocity();
             double mass = entity.GetMass();
 
@@ -110,11 +109,8 @@ namespace SDL_2_Test.engine
             else
                 forceLength = force.Length();
 
-
             double acceleration = forceLength / mass;
             velocity += elapsed * acceleration;
-
-
 
             float x;
             float y;
@@ -126,15 +122,25 @@ namespace SDL_2_Test.engine
             var keyArray = Variables.KeyArray;
             Main.Input(keyArray, entity, elapsed, isGrounded, x, y);
 
-            Entity collider = CheckCollision(entity);
-            if (collider != null)
-                SolveCollision(entity, collider);
+            List<Entity> list;
+            list = CheckCollision(entity);
+            if(list.Count() > 0)
+            {
+                foreach(Entity collider in list)
+                {
+                    SolveCollision(entity, collider);
+                }
+            }
+           
         }
 
-        public static Entity CheckCollision(Entity entity)
+        public static List<Entity> CheckCollision(Entity entity)
         {
+            List<Entity> list = new List<Entity>();
             int i = 0;
-            while (i < Variables.Entities.Count && Variables.Entities[i] != null)
+            if (Variables.Entities[i] == null)
+                return list;
+            while (i < Variables.Entities.Count)
             {
                 if (!Variables.Entities[i].GetSolid() || entity == Variables.Entities[i])
                 {
@@ -161,11 +167,10 @@ namespace SDL_2_Test.engine
                     i++;
                     continue;
                 }
-                if (entity.GetType() == typeof(Player) && Variables.Entities[i].GetType() == typeof(Obstacle))
-                    Debug.Write("Hit\n");
-                return Variables.Entities[i];
+                list.Add(Variables.Entities[i]);
+                i++;
             }
-            return null;
+            return list;
         }
         public static void SolveCollision(Entity entity, Entity collider)
         {

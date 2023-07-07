@@ -109,10 +109,17 @@ namespace SDL_2_Test.engine
     public class SpriteComponent : Component
     {
         public int assetsIndex;
+        public int spriteX;
+        public int spriteY;
         public int spriteWidth;
         public int spriteHeight;
         public int spriteRow;
         public int spriteCol;
+        public int spriteXDiff;
+        public int spriteYDiff;
+        public int speed;
+        public short facing;
+        public bool animated;
     }
 
     #endregion
@@ -122,13 +129,24 @@ namespace SDL_2_Test.engine
     public class Entity
     {
         public int Id { get; set; }
-        List<Component> Components = new List<Component>();
+        private  List<Component> Components = new List<Component>();
 
         public Entity()
         {
             Id = EcsId.GetId();
         }
 
+        public bool HasComponent<T>()
+        {
+            foreach (Component component in Components)
+            {
+                if (component.GetType().Equals(typeof(T)))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
         public bool Grounded()
         {
             var obstacles = EntityManager.GetAll<Obstacle>();
@@ -362,12 +380,38 @@ namespace SDL_2_Test.engine
                 }
             }
         }
+
+        public void SetSprite(SpriteComponent spriteComponent)
+        {
+            for (int i = 0; i < Components.Count; i++)
+            {
+                if (Components[i].GetType().Equals(typeof(SpriteComponent)))
+                {
+                    Components[i] = spriteComponent;
+                }
+            }
+        }
+
+        public short GetFacing()
+        {
+            var c = GetComponent<SpriteComponent>();
+            return c.facing;
+        }
+
+        public void SetFacing(short facing)
+        {
+            var c = GetComponent<SpriteComponent>();
+            c.facing = facing;
+            SetSprite(c);
+        }
+
+
     }
 
 
     public class Player : Entity
     {
-        public Player()
+        public Player(int spriteIndex)
         {
             NameComponent nameComponent = new NameComponent();
             nameComponent.Name = "Player";
@@ -382,8 +426,8 @@ namespace SDL_2_Test.engine
             {
                 x = 300,
                 y = 200,
-                w = 40,
-                h = 40
+                w = 66,
+                h = 92
             };
             AddComponent(hitboxComponent);
 
@@ -408,11 +452,21 @@ namespace SDL_2_Test.engine
             MoveableObjectComponent moveableObjectComponent = new MoveableObjectComponent();
             moveableObjectComponent.MoveableObject = true;
             AddComponent(moveableObjectComponent);
-
-            ShapeComponent shapeComponent = new ShapeComponent();
-            shapeComponent.Shape = GetTexture();
-            shapeComponent.ShapesCount = shapeComponent.Shape.Length;
-            AddComponent(shapeComponent);
+            
+            SpriteComponent spriteComponent = new SpriteComponent();
+            spriteComponent.assetsIndex = spriteIndex;
+            spriteComponent.spriteX = 45;
+            spriteComponent.spriteY = 25;
+            spriteComponent.spriteWidth = 33;
+            spriteComponent.spriteHeight = 46;
+            spriteComponent.spriteCol = 0;
+            spriteComponent.spriteRow = 0;
+            spriteComponent.spriteXDiff = 115;
+            spriteComponent.spriteYDiff = 84;
+            spriteComponent.speed = 100;
+            spriteComponent.facing = 1;
+            spriteComponent.animated = true;
+            AddComponent(spriteComponent);
         }
 
         public (SDL.SDL_FRect, SDL.SDL_Color)[] GetTexture()
@@ -422,7 +476,7 @@ namespace SDL_2_Test.engine
     }
     public class Obstacle : Entity
     {
-        public Obstacle()
+        public Obstacle(int spriteIndex, float x, float y, float h, float w)
         {
             NameComponent nameComponent = new NameComponent();
             nameComponent.Name = "Obstacle";
@@ -435,10 +489,10 @@ namespace SDL_2_Test.engine
             HitboxComponent hitboxComponent = new HitboxComponent();
             hitboxComponent.Hitbox = new SDL.SDL_FRect
             {
-                x = 0,
-                y = Variables.LevelHeight - 50,
-                h = 50,
-                w = Variables.LevelWidth,
+                x = x,
+                y = y,
+                h = h,
+                w = w,
             };
             AddComponent(hitboxComponent);
 
@@ -450,10 +504,10 @@ namespace SDL_2_Test.engine
             moveableObjectComponent.MoveableObject = false;
             AddComponent(moveableObjectComponent);
 
-            ShapeComponent shapeComponent = new ShapeComponent();
-            shapeComponent.Shape = GetTexture();
-            shapeComponent.ShapesCount = shapeComponent.Shape.Length;
-            AddComponent(shapeComponent);
+            SpriteComponent sc = new SpriteComponent();
+            sc.animated = false;
+            sc.assetsIndex = spriteIndex;
+            AddComponent(sc);
         }
 
         public (SDL.SDL_FRect, SDL.SDL_Color)[] GetTexture()
@@ -464,7 +518,7 @@ namespace SDL_2_Test.engine
     }
     public class Fruit : Entity
     {
-        public Fruit()
+        public Fruit(int spriteIndex)
         {
 
             NameComponent nameC = new NameComponent();
@@ -505,16 +559,104 @@ namespace SDL_2_Test.engine
             moveableObjectComponent.MoveableObject = true;
             AddComponent(moveableObjectComponent);
 
-            ShapeComponent shapeC = new ShapeComponent();
-            shapeC.Shape = GetTexture();
-            shapeC.ShapesCount = shapeC.Shape.Length;
-            AddComponent(shapeC);
+            SpriteComponent sc = new SpriteComponent();
+            sc.animated = false;
+            sc.assetsIndex = spriteIndex;
+            AddComponent(sc);
         }
 
         public (SDL.SDL_FRect, SDL.SDL_Color)[] GetTexture()
         {
             SDL.SDL_FRect hitbox = GetComponent<HitboxComponent>().Hitbox;
             return Textures.FruitShape(hitbox.x, hitbox.y);
+        }
+    }
+
+    public class Texture : Entity
+    {
+        public Texture(int spriteIndex, int x, int y, int w, int h)
+        {
+            MoveableObjectComponent moveableObjectComponent = new MoveableObjectComponent();
+            moveableObjectComponent.MoveableObject = false;
+            AddComponent(moveableObjectComponent);
+
+            SolidComponent solidC = new SolidComponent();
+            solidC.Solid = false;
+            AddComponent(solidC);
+
+            HitboxComponent hitboxComponent = new HitboxComponent();
+            hitboxComponent.Hitbox = new SDL.SDL_FRect
+            {
+                x = x,
+                y = y,
+                h = h,
+                w = w,
+            };
+            AddComponent(hitboxComponent);
+
+            SpriteComponent sc = new SpriteComponent();
+            sc.animated = false;
+            sc.assetsIndex = spriteIndex;
+            AddComponent(sc);
+        }
+    }
+
+    public class Frog : Entity
+    {
+        public Frog(int spriteIndex, int x, int y, int w, int h)
+        {
+            NameComponent nameComponent = new NameComponent();
+            nameComponent.Name = "Frog";
+            AddComponent(nameComponent);
+
+            SolidComponent solidComponent = new SolidComponent();
+            solidComponent.Solid = true;
+            AddComponent(solidComponent);
+
+            HitboxComponent hitboxComponent = new HitboxComponent();
+            hitboxComponent.Hitbox = new SDL.SDL_FRect
+            {
+                x = 300,
+                y = 200,
+                w = 81,
+                h = 63
+            };
+            AddComponent(hitboxComponent);
+
+            VelocityComponent velocityComponent = new VelocityComponent();
+            velocityComponent.Velocity = 0;
+            AddComponent(velocityComponent);
+
+            MassComponent massComponent = new MassComponent();
+            massComponent.Mass = 85;
+            AddComponent(massComponent);
+
+            ForceComponent forceComponent = new ForceComponent();
+            forceComponent.Force = new Vector(0, 9.8 * 85);
+            AddComponent(forceComponent);
+
+            PhysicsObjectComponent physicsObjectComponent = new PhysicsObjectComponent();
+            physicsObjectComponent.PhysicsObject = true;
+            AddComponent(physicsObjectComponent);
+
+            MoveableObjectComponent moveableObjectComponent = new MoveableObjectComponent();
+            moveableObjectComponent.MoveableObject = true;
+            AddComponent(moveableObjectComponent);
+
+            SpriteComponent spriteComponent = new SpriteComponent();
+            spriteComponent.assetsIndex = spriteIndex;
+            spriteComponent.spriteX = 0;
+            spriteComponent.spriteY = 0;
+            spriteComponent.spriteWidth = 27;
+            spriteComponent.spriteHeight = 21;
+            spriteComponent.spriteCol = 0;
+            spriteComponent.spriteRow = 0;
+            spriteComponent.spriteXDiff = 27;
+            spriteComponent.spriteYDiff = 21;
+            spriteComponent.speed = 350;
+            spriteComponent.facing = 1;
+            spriteComponent.animated = true;
+            AddComponent(spriteComponent);
         }
     }
 }
