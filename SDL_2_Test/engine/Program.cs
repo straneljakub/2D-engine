@@ -92,7 +92,7 @@ namespace SDL_2_Test.engine
             void Setup()
             {
                 // Initilizes SDL.
-                if (SDL.SDL_Init(SDL.SDL_INIT_VIDEO) < 0)
+                if (SDL.SDL_Init(SDL.SDL_INIT_VIDEO | SDL.SDL_INIT_AUDIO) < 0)
                 {
                     Console.WriteLine($"There was an issue initializing SDL. {SDL.SDL_GetError()}");
                 }
@@ -139,7 +139,16 @@ namespace SDL_2_Test.engine
                 SDL.SDL_SetRenderDrawBlendMode(Variables.Renderer, SDL.SDL_BlendMode.SDL_BLENDMODE_BLEND);
 
 
-                
+                var mixerFlags = SDL_mixer.MIX_InitFlags.MIX_INIT_FLAC | SDL_mixer.MIX_InitFlags.MIX_INIT_MID |SDL_mixer.MIX_InitFlags.MIX_INIT_MP3 | SDL_mixer.MIX_InitFlags.MIX_INIT_OGG | SDL_mixer.MIX_InitFlags.MIX_INIT_MOD;
+                if(SDL_mixer.Mix_Init(mixerFlags) < 0)
+                {
+                    Console.WriteLine($"There was an issue initializing SDL_mixer. {SDL.SDL_GetError()}");
+                }
+
+               if( SDL_mixer.Mix_OpenAudio(44100, SDL_mixer.MIX_DEFAULT_FORMAT, 5, 2024) < 0)
+                {
+                    Debug.WriteLine($"There was an issue initializing SDL_mixer. {SDL.SDL_GetError()}");
+                }
 
                 // Obstacles init
                 int index = Assets.AddAsset("./assets/grass.png");
@@ -167,6 +176,9 @@ namespace SDL_2_Test.engine
                 var wall2 = new Obstacle(index, Variables.LevelWidth - 30, 0, Variables.LevelHeight - 50, 30);
                 Variables.Entities.Add(wall2);
 
+                index = Assets.AddAsset("./assets/jump.wav");
+                index = Assets.AddAsset("./assets/music.wav");
+                Audio.PlayMusic(Assets.AssetsArray[index]);
 
 
                 // Fruit init
@@ -307,6 +319,7 @@ namespace SDL_2_Test.engine
                 }
                 SDL.SDL_DestroyRenderer(Variables.Renderer);
                 SDL.SDL_DestroyWindow(Variables.Window);
+                SDL_mixer.Mix_Quit();
                 SDL.SDL_Quit();
 
             }

@@ -39,8 +39,6 @@ namespace SDL_2_Test
                     x += (float)(Variables.PlayerSpeedAir * elapsed);
                     entity.SetFacing(1);
                 }
-                    
-
 
                 //jump
                 if (keyArray[(int)SDL.SDL_Scancode.SDL_SCANCODE_UP] == 1 && isGrounded)
@@ -48,6 +46,7 @@ namespace SDL_2_Test
                     entity.SetForce(0, (float)(entity.GetMass() * 9.8) * -10);
                     entity.SetVelocity(40);
                     entity.SetHitbox(0, -1);
+                    Audio.PlayEffect(Assets.AssetsArray[3]);
                 }
             }
 
