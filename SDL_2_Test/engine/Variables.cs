@@ -29,7 +29,8 @@ namespace SDL_2_Test.engine
         public static int PlayerSpeed = 350;
         public static int PlayerSpeedAir = 200;
 
-        public static bool Running;
+        public static bool Running = false;
+        public static bool Quit = false;
         // Nanoseconds
         public static int FrameDuration = 8333333;
         //Current framerate
@@ -50,5 +51,10 @@ namespace SDL_2_Test.engine
 
         //Key Array
         public static byte[] KeyArray = new byte[512];
+
+
+        //Menu buttons
+        public static Button PlayButton;
+        public static Button QuitButton;
     }
 }

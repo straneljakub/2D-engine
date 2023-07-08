@@ -48,6 +48,10 @@ namespace SDL_2_Test
                     entity.SetHitbox(0, -1);
                     Audio.PlayEffect(Assets.AssetsArray[3]);
                 }
+                if (keyArray[(int)SDL.SDL_Scancode.SDL_SCANCODE_ESCAPE] == 1)
+                {
+                    Variables.Running = false;
+                }
             }
 
             entity.SetHitbox(x, y);

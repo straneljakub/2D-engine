@@ -6,13 +6,13 @@ using System.Runtime.InteropServices;
 
 namespace SDL_2_Test.engine
 {
-    class Program
+    public class Program
     {
         public static void Main(string[] args)
         {
             Setup();
 
-            Variables.Running = true;
+
 
 
 
@@ -28,57 +28,67 @@ namespace SDL_2_Test.engine
 
             int size;
 
-
-            while (Variables.Running)
+            while (!Variables.Running)
             {
-                // Start counting
-                sw = Stopwatch.StartNew();
-
-
-
-
-                // Main Game Loop Functions Start
-                PollEvents();
-                IntPtr state = SDL.SDL_GetKeyboardState(out size);
-                Marshal.Copy(state, Variables.KeyArray, 0, size);
-                Physics.Update(elapsed);
-                Camera.Update();
-                Assets.Animate(elapsed);
-                Render();
-                // Main Game Loop Functions End
-
-
-
-                // Stop counting
-                sw.Stop();
-
-                // Nanoseconds
-                elapsed = sw.Elapsed.TotalMilliseconds * 1000000;
-
-                // Frame + 1
-                frameSum += 1;
-
-                // Draw FPS every second
-                nanosecondsSum += Variables.FrameDuration;// elapsed;
-                if (nanosecondsSum >= 1000000000)
+                GUI.PollMenuEvents();
+                GUI.DrawMenu();
+                if (Variables.Quit)
                 {
-                    Variables.CurrentFps = frameSum;
-                    Draw.IsFpsInvalid = true;
-                    nanosecondsSum = 0;
-                    frameSum = 0;
+                    break;
                 }
-
-
-                // If time of 1 frame is shorther than frame duration, sleep
-
-                if (elapsed < Variables.FrameDuration)
+                while (Variables.Running)
                 {
-                    sleepMiliseconds = (Variables.FrameDuration - (int)elapsed) / 1000000;
-                    Thread.Sleep(sleepMiliseconds);
-                    elapsed = Variables.FrameDuration;
+                    // Start counting
+                    sw = Stopwatch.StartNew();
+
+
+
+
+                    // Main Game Loop Functions Start
+                    PollEvents();
+                    IntPtr state = SDL.SDL_GetKeyboardState(out size);
+                    Marshal.Copy(state, Variables.KeyArray, 0, size);
+                    Physics.Update(elapsed);
+                    Camera.Update();
+                    Assets.Animate(elapsed);
+                    Render();
+                    // Main Game Loop Functions End
+
+
+
+                    // Stop counting
+                    sw.Stop();
+
+                    // Nanoseconds
+                    elapsed = sw.Elapsed.TotalMilliseconds * 1000000;
+
+                    // Frame + 1
+                    frameSum += 1;
+
+                    // Draw FPS every second
+                    nanosecondsSum += Variables.FrameDuration;// elapsed;
+                    if (nanosecondsSum >= 1000000000)
+                    {
+                        Variables.CurrentFps = frameSum;
+                        Draw.IsFpsInvalid = true;
+                        nanosecondsSum = 0;
+                        frameSum = 0;
+                    }
+
+
+                    // If time of 1 frame is shorther than frame duration, sleep
+
+                    if (elapsed < Variables.FrameDuration)
+                    {
+                        sleepMiliseconds = (Variables.FrameDuration - (int)elapsed) / 1000000;
+                        Thread.Sleep(sleepMiliseconds);
+                        elapsed = Variables.FrameDuration;
+                    }
+                    if (!Variables.Running)
+                    {
+                        break;
+                    }
                 }
-
-
             }
 
 
@@ -139,19 +149,25 @@ namespace SDL_2_Test.engine
                 SDL.SDL_SetRenderDrawBlendMode(Variables.Renderer, SDL.SDL_BlendMode.SDL_BLENDMODE_BLEND);
 
 
-                var mixerFlags = SDL_mixer.MIX_InitFlags.MIX_INIT_FLAC | SDL_mixer.MIX_InitFlags.MIX_INIT_MID |SDL_mixer.MIX_InitFlags.MIX_INIT_MP3 | SDL_mixer.MIX_InitFlags.MIX_INIT_OGG | SDL_mixer.MIX_InitFlags.MIX_INIT_MOD;
-                if(SDL_mixer.Mix_Init(mixerFlags) < 0)
+                var mixerFlags = SDL_mixer.MIX_InitFlags.MIX_INIT_FLAC | SDL_mixer.MIX_InitFlags.MIX_INIT_MID | SDL_mixer.MIX_InitFlags.MIX_INIT_MP3 | SDL_mixer.MIX_InitFlags.MIX_INIT_OGG | SDL_mixer.MIX_InitFlags.MIX_INIT_MOD;
+                if (SDL_mixer.Mix_Init(mixerFlags) < 0)
                 {
                     Console.WriteLine($"There was an issue initializing SDL_mixer. {SDL.SDL_GetError()}");
                 }
 
-               if( SDL_mixer.Mix_OpenAudio(44100, SDL_mixer.MIX_DEFAULT_FORMAT, 5, 2024) < 0)
+                if (SDL_mixer.Mix_OpenAudio(44100, SDL_mixer.MIX_DEFAULT_FORMAT, 5, 2024) < 0)
                 {
                     Debug.WriteLine($"There was an issue initializing SDL_mixer. {SDL.SDL_GetError()}");
                 }
 
+                
+
+               
+
                 // Obstacles init
                 int index = Assets.AddAsset("./assets/grass.png");
+                Variables.PlayButton = new Button(Variables.ScreenWidth / 2 - 300 / 2, 100, 300, 70, "Play", index);
+                Variables.QuitButton = new Button(Variables.ScreenWidth / 2 - 300 / 2, 250, 300, 70, "Quit", index);
                 var obs = new Obstacle(index, 0, Variables.LevelHeight - 50, 50, Variables.LevelWidth);
                 Variables.Entities.Add(obs);
 
@@ -243,9 +259,9 @@ namespace SDL_2_Test.engine
                 // Clears the current render surface.
                 SDL.SDL_RenderClear(Variables.Renderer);
 
-                foreach(Entity entity in Variables.Entities)
+                foreach (Entity entity in Variables.Entities)
                 {
-                    if(entity.GetType()==typeof(Player))
+                    if (entity.GetType() == typeof(Player))
                     {
                         continue;
                     }
@@ -255,7 +271,7 @@ namespace SDL_2_Test.engine
                     h.x -= Variables.Camera.x;
                     h.y -= Variables.Camera.y;
 
-                    if(sc.animated)
+                    if (sc.animated)
                     {
                         SDL.SDL_Rect s = new SDL.SDL_Rect()
                         {
@@ -272,7 +288,8 @@ namespace SDL_2_Test.engine
                         {
                             SDL.SDL_RenderCopyExF(Variables.Renderer, t, ref s, ref h, 0, IntPtr.Zero, SDL.SDL_RendererFlip.SDL_FLIP_HORIZONTAL);
                         }
-                    } else
+                    }
+                    else
                     {
                         SDL.SDL_RenderCopyF(Variables.Renderer, t, IntPtr.Zero, ref h);
                     }
@@ -301,7 +318,7 @@ namespace SDL_2_Test.engine
                 {
                     SDL.SDL_RenderCopyExF(Variables.Renderer, texture, ref src, ref hitbox, 0, IntPtr.Zero, SDL.SDL_RendererFlip.SDL_FLIP_HORIZONTAL);
                 }
-                
+
 
 
                 // Draw fps to screen
@@ -311,18 +328,18 @@ namespace SDL_2_Test.engine
 
             }
 
-            void CleanUp()
+        }
+        public static void CleanUp()
+        {
+            for (int i = 0; i < Assets.Index; i++)
             {
-                for(int i = 0; i < Assets.Index; i++)
-                {
-                    SDL.SDL_DestroyTexture(Assets.AssetsArray[i]);
-                }
-                SDL.SDL_DestroyRenderer(Variables.Renderer);
-                SDL.SDL_DestroyWindow(Variables.Window);
-                SDL_mixer.Mix_Quit();
-                SDL.SDL_Quit();
-
+                SDL.SDL_DestroyTexture(Assets.AssetsArray[i]);
             }
+            SDL.SDL_DestroyRenderer(Variables.Renderer);
+            SDL.SDL_DestroyWindow(Variables.Window);
+            SDL_mixer.Mix_Quit();
+            SDL.SDL_Quit();
+
         }
     }
 }
