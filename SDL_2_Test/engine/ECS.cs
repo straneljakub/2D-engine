@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SDL2;
+using Newtonsoft.Json;
 
 namespace SDL_2_Test.engine
 {
@@ -53,9 +54,9 @@ namespace SDL_2_Test.engine
     #endregion
 
     #region Components
+    [JsonObject]
     public class Component
     {
-        public Entity Entity;
         public void Update()
         {
         }
@@ -126,10 +127,12 @@ namespace SDL_2_Test.engine
 
     #region Entities
 
+    [JsonObject]
     public class Entity
     {
         public int Id { get; set; }
-        private  List<Component> Components = new List<Component>();
+        [JsonProperty]
+        public  List<Component> Components = new List<Component>();
 
         public Entity()
         {
@@ -208,7 +211,6 @@ namespace SDL_2_Test.engine
         public void AddComponent(Component component)
         {
             Components.Add(component);
-            component.Entity = this;
         }
 
         public T GetComponent<T>() where T : Component
@@ -408,7 +410,6 @@ namespace SDL_2_Test.engine
 
     }
 
-
     public class Player : Entity
     {
         public Player(int spriteIndex)
@@ -474,6 +475,7 @@ namespace SDL_2_Test.engine
             return Textures.PlayerShape();
         }
     }
+    [JsonObject]
     public class Obstacle : Entity
     {
         public Obstacle(int spriteIndex, float x, float y, float h, float w)
@@ -516,6 +518,7 @@ namespace SDL_2_Test.engine
             return Textures.ObstacleShape(hitbox.x, hitbox.y);
         }
     }
+    [JsonObject]
     public class Fruit : Entity
     {
         public Fruit(int spriteIndex)

@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Newtonsoft.Json;
 
 
 namespace SDL_2_Test.engine
@@ -160,14 +161,11 @@ namespace SDL_2_Test.engine
                     Debug.WriteLine($"There was an issue initializing SDL_mixer. {SDL.SDL_GetError()}");
                 }
 
-                
 
-               
 
-                // Obstacles init
+                /*
                 int index = Assets.AddAsset("./assets/grass.png");
-                Variables.PlayButton = new Button(Variables.ScreenWidth / 2 - 300 / 2, 100, 300, 70, "Play", index);
-                Variables.QuitButton = new Button(Variables.ScreenWidth / 2 - 300 / 2, 250, 300, 70, "Quit", index);
+                // Obstacles init
                 var obs = new Obstacle(index, 0, Variables.LevelHeight - 50, 50, Variables.LevelWidth);
                 Variables.Entities.Add(obs);
 
@@ -205,7 +203,16 @@ namespace SDL_2_Test.engine
                     Variables.Entities.Add(fruit);
                 }
 
-                Variables.Entities.Add(new Player(Assets.AddAsset("./assets/viking.png")));
+                var player = new Player(Assets.AddAsset("./assets/viking.png"));
+                Variables.Entities.Add(player);
+                
+                */
+
+                Level.LoadLevel("level1.txt");
+
+                Variables.PlayButton = new Button(Variables.ScreenWidth / 2 - 300 / 2, 100, 300, 70, "Play", 0);
+                Variables.SaveButton = new Button(Variables.ScreenWidth / 2 - 300 / 2, 250, 300, 70, "Save", 0);
+                Variables.QuitButton = new Button(Variables.ScreenWidth / 2 - 300 / 2, 400, 300, 70, "Quit", 0);
             }
 
 

@@ -11,10 +11,12 @@ namespace SDL_2_Test.engine
     public static class Assets
     {
         public static IntPtr[] AssetsArray = new IntPtr[1024];
+        public static List<string> AssetsPaths = new List<string>();
         public static int Index = 0;
 
         public static int AddAsset(string path)
         {
+            AssetsPaths.Add(path);
             var extension = path.Split('.').Last();
             if(extension == "jpg" || extension == "png")
             {

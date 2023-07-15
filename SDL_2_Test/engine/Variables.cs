@@ -56,5 +56,6 @@ namespace SDL_2_Test.engine
         //Menu buttons
         public static Button PlayButton;
         public static Button QuitButton;
+        public static Button SaveButton;
     }
 }

@@ -61,6 +61,10 @@ namespace SDL_2_Test.engine
                                 Program.CleanUp();
                                 Variables.Quit = true;
                                 break;
+                            } 
+                            else if (ButtonClicked(Variables.SaveButton, e)) {
+                                Level.SaveLevel();
+                                break;
                             }
                         }
                         break;
