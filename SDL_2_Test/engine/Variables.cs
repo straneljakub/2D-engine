@@ -57,5 +57,6 @@ namespace SDL_2_Test.engine
         public static Button PlayButton;
         public static Button QuitButton;
         public static Button SaveButton;
+        public static Boolean DrawFps = true;
     }
 }

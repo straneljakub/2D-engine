@@ -63,7 +63,7 @@ namespace SDL_2_Test.engine
 
         public static void Animate(double elapsed)
         {
-            Main.Animations(elapsed);
+            MainProgram.Animations(elapsed);
         }
     }
 

@@ -32,6 +32,7 @@ namespace SDL_2_Test.engine
             while (!Variables.Running)
             {
                 GUI.PollMenuEvents();
+                MainProgram.MenuLoop();
                 GUI.DrawMenu();
                 if (Variables.Quit)
                 {
@@ -47,6 +48,7 @@ namespace SDL_2_Test.engine
 
                     // Main Game Loop Functions Start
                     PollEvents();
+                    MainProgram.GameLoop();
                     IntPtr state = SDL.SDL_GetKeyboardState(out size);
                     Marshal.Copy(state, Variables.KeyArray, 0, size);
                     Physics.Update(elapsed);
@@ -68,7 +70,7 @@ namespace SDL_2_Test.engine
 
                     // Draw FPS every second
                     nanosecondsSum += Variables.FrameDuration;// elapsed;
-                    if (nanosecondsSum >= 1000000000)
+                    if (nanosecondsSum >= 1000000000 && Variables.DrawFps == true)
                     {
                         Variables.CurrentFps = frameSum;
                         Draw.IsFpsInvalid = true;
@@ -162,57 +164,7 @@ namespace SDL_2_Test.engine
                 }
 
 
-
-                /*
-                int index = Assets.AddAsset("./assets/grass.png");
-                // Obstacles init
-                var obs = new Obstacle(index, 0, Variables.LevelHeight - 50, 50, Variables.LevelWidth);
-                Variables.Entities.Add(obs);
-
-                obs = new Obstacle(index, 130, Variables.LevelHeight - 200, 50, 400);
-                Variables.Entities.Add(obs);
-
-                obs = new Obstacle(index, 300, Variables.LevelHeight - 400, 50, 400);
-                Variables.Entities.Add(obs);
-
-                index = Assets.AddAsset("./assets/ker.png");
-                var tree = new Texture(index, 120, Variables.LevelHeight - 400, 200, 200);
-                Variables.Entities.Add(tree);
-
-                tree = new Texture(index, 600, Variables.LevelHeight - 250, 200, 200);
-                Variables.Entities.Add(tree);
-
-                index = Assets.AddAsset("./assets/wall.jpg");
-                var wall1 = new Obstacle(index, 0, 0, Variables.LevelHeight - 50, 30);
-                Variables.Entities.Add(wall1);
-
-
-                var wall2 = new Obstacle(index, Variables.LevelWidth - 30, 0, Variables.LevelHeight - 50, 30);
-                Variables.Entities.Add(wall2);
-
-                index = Assets.AddAsset("./assets/jump.wav");
-                index = Assets.AddAsset("./assets/music.wav");
-                Audio.PlayMusic(Assets.AssetsArray[index]);
-
-
-                // Fruit init
-                index = Assets.AddAsset("./assets/apple.png");
-                for (int i = 0; i < 40; i++)
-                {
-                    var fruit = new Fruit(index);
-                    Variables.Entities.Add(fruit);
-                }
-
-                var player = new Player(Assets.AddAsset("./assets/viking.png"));
-                Variables.Entities.Add(player);
-                
-                */
-
-                Level.LoadLevel("level1.txt");
-
-                Variables.PlayButton = new Button(Variables.ScreenWidth / 2 - 300 / 2, 100, 300, 70, "Play", 0);
-                Variables.SaveButton = new Button(Variables.ScreenWidth / 2 - 300 / 2, 250, 300, 70, "Save", 0);
-                Variables.QuitButton = new Button(Variables.ScreenWidth / 2 - 300 / 2, 400, 300, 70, "Quit", 0);
+                MainProgram.Init();
             }
 
 

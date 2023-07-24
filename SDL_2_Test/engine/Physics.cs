@@ -120,7 +120,7 @@ namespace SDL_2_Test.engine
             entity.SetVelocity(velocity);
 
             var keyArray = Variables.KeyArray;
-            Main.Input(keyArray, entity, elapsed, isGrounded, x, y);
+            MainProgram.Input(keyArray, entity, elapsed, isGrounded, x, y);
 
             List<Entity> list;
             list = CheckCollision(entity);
@@ -175,7 +175,7 @@ namespace SDL_2_Test.engine
         public static void SolveCollision(Entity entity, Entity collider)
         {
 
-            if (Main.CollisionResolve(entity, collider))
+            if (MainProgram.CollisionResolve(entity, collider))
                 return;
 
 

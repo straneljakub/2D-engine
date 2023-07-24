@@ -54,17 +54,14 @@ namespace SDL_2_Test.engine
                             if (ButtonClicked(Variables.PlayButton, e))
                             {
                                 Variables.Running = true;
-                                break;
                             }
                             else if (ButtonClicked(Variables.QuitButton, e))
                             {
                                 Program.CleanUp();
                                 Variables.Quit = true;
-                                break;
                             } 
                             else if (ButtonClicked(Variables.SaveButton, e)) {
                                 Level.SaveLevel();
-                                break;
                             }
                         }
                         break;
