@@ -47,11 +47,11 @@ namespace SDL_2_Test.engine
             return -1;
         }
 
-        public static int AddText(string text)
+        public static int AddText(string text, SDL.SDL_Color color, string font)
         {
-            IntPtr arial = SDL_ttf.TTF_OpenFont(Path.Combine(AppContext.BaseDirectory, "arial.ttf"), 26);
-            SDL.SDL_Color white = new SDL.SDL_Color() { r = 255, g = 255, b = 255, a = 255 };
-            IntPtr surfaceText = SDL_ttf.TTF_RenderText_Solid(arial, text, white);
+            IntPtr arial = SDL_ttf.TTF_OpenFont(Path.Combine(AppContext.BaseDirectory, font), 26);
+            // { r = 255, g = 255, b = 255, a = 255 };
+            IntPtr surfaceText = SDL_ttf.TTF_RenderText_Solid(arial, text, color);
             IntPtr textTexture = SDL.SDL_CreateTextureFromSurface(Variables.Renderer, surfaceText);
             
             if (textTexture == IntPtr.Zero)

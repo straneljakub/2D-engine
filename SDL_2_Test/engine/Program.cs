@@ -13,10 +13,6 @@ namespace SDL_2_Test.engine
         {
             Setup();
 
-
-
-
-
             Stopwatch sw;
 
             // Nanoseconds

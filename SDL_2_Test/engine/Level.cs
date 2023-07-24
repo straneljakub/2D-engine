@@ -44,9 +44,9 @@ namespace SDL_2_Test.engine
 
         public static void LoadLevel(string fileName)
         {
-            if (File.Exists("./levels/" + fileName))
+            if (File.Exists("./levels/" + fileName + ".txt"))
             {
-                string json = File.ReadAllText("./levels/" + fileName);
+                string json = File.ReadAllText("./levels/" + fileName + ".txt");
 
                 var settings = new JsonSerializerSettings
                 {
@@ -58,9 +58,9 @@ namespace SDL_2_Test.engine
                 Variables.Entities = entities;
             }
 
-            if (File.Exists("./levels/assets" + fileName))
+            if (File.Exists("./levels/assets" + fileName + ".txt"))
             {
-                string json = File.ReadAllText("./levels/assets" + fileName);
+                string json = File.ReadAllText("./levels/assets" + fileName + ".txt");
 
                 var settings = new JsonSerializerSettings
                 {

@@ -51,18 +51,7 @@ namespace SDL_2_Test.engine
                         break;
                     case SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN:
                         {
-                            if (ButtonClicked(Variables.PlayButton, e))
-                            {
-                                Variables.Running = true;
-                            }
-                            else if (ButtonClicked(Variables.QuitButton, e))
-                            {
-                                Program.CleanUp();
-                                Variables.Quit = true;
-                            } 
-                            else if (ButtonClicked(Variables.SaveButton, e)) {
-                                Level.SaveLevel();
-                            }
+                            MainProgram.MenuMouseInput(e);
                         }
                         break;
 
@@ -92,7 +81,7 @@ namespace SDL_2_Test.engine
         public int buttonTexture;
         public bool clicked;
 
-        public Button(int x, int y, int w, int h, string text, int buttonIndex)
+        public Button(int x, int y, int w, int h, string text, int buttonIndex, SDL.SDL_Color color)
         {
             this.rect = new SDL.SDL_Rect();
             this.rect.x = x;
@@ -102,7 +91,7 @@ namespace SDL_2_Test.engine
             this.text = text;
             this.buttonTexture = buttonIndex;
             this.clicked = false;
-            this.textTexture = Assets.AddText(text);
+            this.textTexture = Assets.AddText(text, color, "arial.ttf");
             GUI.Buttons.Add(this);
         }
     }

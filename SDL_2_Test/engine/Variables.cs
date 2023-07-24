@@ -58,5 +58,7 @@ namespace SDL_2_Test.engine
         public static Button QuitButton;
         public static Button SaveButton;
         public static Boolean DrawFps = true;
+        public static Boolean GameOver = false;
+        public static string CurrentLevel = "";
     }
 }

@@ -40,5 +40,10 @@ namespace SDL_2_Test.engine
 
 
         }
+
+        public static void DrawText(int spriteIndex)
+        {
+            SDL.SDL_RenderCopy(Variables.Renderer, Message, IntPtr.Zero, Assets.AssetsArray[spriteIndex]);
+        }
     }
 }

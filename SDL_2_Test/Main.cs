@@ -10,58 +10,62 @@ namespace SDL_2_Test
 {
     public static class MainProgram
     {
-
         public static void Init()
         {
             /*
-                int index = Assets.AddAsset("./assets/grass.png");
-                // Obstacles init
-                var obs = new Obstacle(index, 0, Variables.LevelHeight - 50, 50, Variables.LevelWidth);
-                Variables.Entities.Add(obs);
+            int index = Assets.AddAsset("./assets/grass.png");
+            // Obstacles init
+            var obs = new Obstacle(index, 0, Variables.LevelHeight - 50, 50, Variables.LevelWidth);
+            Variables.Entities.Add(obs);
 
-                obs = new Obstacle(index, 130, Variables.LevelHeight - 200, 50, 400);
-                Variables.Entities.Add(obs);
+            obs = new Obstacle(index, 130, Variables.LevelHeight - 200, 50, 400);
+            Variables.Entities.Add(obs);
 
-                obs = new Obstacle(index, 300, Variables.LevelHeight - 400, 50, 400);
-                Variables.Entities.Add(obs);
+            obs = new Obstacle(index, 300, Variables.LevelHeight - 400, 50, 400);
+            Variables.Entities.Add(obs);
 
-                index = Assets.AddAsset("./assets/ker.png");
-                var tree = new Texture(index, 120, Variables.LevelHeight - 400, 200, 200);
-                Variables.Entities.Add(tree);
+            index = Assets.AddAsset("./assets/ker.png");
+            var tree = new Texture(index, 120, Variables.LevelHeight - 400, 200, 200);
+            Variables.Entities.Add(tree);
 
-                tree = new Texture(index, 600, Variables.LevelHeight - 250, 200, 200);
-                Variables.Entities.Add(tree);
+            tree = new Texture(index, 600, Variables.LevelHeight - 250, 200, 200);
+            Variables.Entities.Add(tree);
 
-                index = Assets.AddAsset("./assets/wall.jpg");
-                var wall1 = new Obstacle(index, 0, 0, Variables.LevelHeight - 50, 30);
-                Variables.Entities.Add(wall1);
-
-
-                var wall2 = new Obstacle(index, Variables.LevelWidth - 30, 0, Variables.LevelHeight - 50, 30);
-                Variables.Entities.Add(wall2);
-
-                index = Assets.AddAsset("./assets/jump.wav");
-                index = Assets.AddAsset("./assets/music.wav");
-                Audio.PlayMusic(Assets.AssetsArray[index]);
+            index = Assets.AddAsset("./assets/wall.jpg");
+            var wall1 = new Obstacle(index, 0, 0, Variables.LevelHeight - 50, 30);
+            Variables.Entities.Add(wall1);
 
 
-                // Fruit init
-                index = Assets.AddAsset("./assets/apple.png");
-                for (int i = 0; i < 40; i++)
-                {
-                    var fruit = new Fruit(index);
-                    Variables.Entities.Add(fruit);
-                }
+            var wall2 = new Obstacle(index, Variables.LevelWidth - 30, 0, Variables.LevelHeight - 50, 30);
+            Variables.Entities.Add(wall2);
 
-                var player = new Player(Assets.AddAsset("./assets/viking.png"));
-                Variables.Entities.Add(player);
-                
-                */
-            Level.LoadLevel("level1.txt");
+            index = Assets.AddAsset("./assets/jump.wav");
+            index = Assets.AddAsset("./assets/music.wav");
+            Audio.PlayMusic(Assets.AssetsArray[index]);
 
-            Variables.PlayButton = new Button(Variables.ScreenWidth / 2 - 300 / 2, 100, 300, 70, "Play", 0);
-            Variables.SaveButton = new Button(Variables.ScreenWidth / 2 - 300 / 2, 250, 300, 70, "Save", 0);
-            Variables.QuitButton = new Button(Variables.ScreenWidth / 2 - 300 / 2, 400, 300, 70, "Quit", 0);
+
+            // Fruit init
+            index = Assets.AddAsset("./assets/apple.png");
+            for (int i = 0; i < 40; i++)
+            {
+                var fruit = new Fruit(index);
+                Variables.Entities.Add(fruit);
+            }
+
+            var player = new Player(Assets.AddAsset("./assets/viking.png"));
+            Variables.Entities.Add(player);
+            index = Assets.AddAsset("./assets/frog.png");
+            var frog = new Frog(index);
+            Variables.Entities.Add(frog);
+            */
+
+            Variables.CurrentLevel = "level4";
+            Level.LoadLevel(Variables.CurrentLevel);
+
+            Variables.PlayButton = new Button(Variables.ScreenWidth / 2 - 300 / 2, 100, 300, 70, "Play", 0, new SDL.SDL_Color { r = 255, g = 255, b = 255, a = 255 });
+            Variables.SaveButton = new Button(Variables.ScreenWidth / 2 - 300 / 2, 250, 300, 70, "Save", 0, new SDL.SDL_Color { r = 255, g = 255, b = 255, a = 255 });
+            Variables.QuitButton = new Button(Variables.ScreenWidth / 2 - 300 / 2, 400, 300, 70, "Quit", 0, new SDL.SDL_Color { r = 255, g = 255, b = 255, a = 255 });
+
 
         }
         public static void Input(byte[] keyArray, Entity entity, double elapsed, bool isGrounded, float x, float y)
@@ -107,7 +111,6 @@ namespace SDL_2_Test
                     Variables.Running = false;
                 }
             }
-
             entity.SetHitbox(x, y);
         }
         //Has to return true when resolved, false otherwise
@@ -149,6 +152,25 @@ namespace SDL_2_Test
                 entity.SetVelocity(0);
                 Variables.Score += 1;
                 return true;
+            }
+
+            if (entity.GetType() == typeof(Frog) && collider.GetType() == typeof(Fruit))
+            {
+                return true;
+            } else if (entity.GetType() == typeof(Fruit) && collider.GetType() == typeof(Frog))
+            {
+                return true;
+            }
+
+            if (entity.GetType() == typeof(Frog) && collider.GetType() == typeof(Player))
+            {
+                Variables.Running = false;
+                Level.LoadLevel(Variables.CurrentLevel);
+            }
+            else if (entity.GetType() == typeof(Player) && collider.GetType() == typeof(Frog))
+            {
+                Variables.Running = false;
+                Level.LoadLevel(Variables.CurrentLevel);
             }
 
             return false;
@@ -206,7 +228,68 @@ namespace SDL_2_Test
         }
         public static void MenuLoop()
         {
+            
+        }
+    }
 
+    public class Frog : Entity
+    {
+        public Frog(int spriteIndex)
+        {
+            NameComponent nameComponent = new NameComponent();
+            nameComponent.Name = "Frog";
+            AddComponent(nameComponent);
+
+            SolidComponent solidComponent = new SolidComponent();
+            solidComponent.Solid = true;
+            AddComponent(solidComponent);
+
+            HitboxComponent hitboxComponent = new HitboxComponent();
+            hitboxComponent.Hitbox = new SDL.SDL_FRect
+            {
+                x = Variables.LevelWidth - 200,
+                y = Variables.LevelHeight - 100,
+                w = 27 * 4,
+                h = 21 * 4
+            };
+            AddComponent(hitboxComponent);
+
+
+
+            VelocityComponent velocityComponent = new VelocityComponent();
+            velocityComponent.Velocity = 0;
+            AddComponent(velocityComponent);
+
+            MassComponent massComponent = new MassComponent();
+            massComponent.Mass = 50;
+            AddComponent(massComponent);
+
+            ForceComponent forceComponent = new ForceComponent();
+            forceComponent.Force = new Vector(0, 9.8 * 85);
+            AddComponent(forceComponent);
+
+            PhysicsObjectComponent physicsObjectComponent = new PhysicsObjectComponent();
+            physicsObjectComponent.PhysicsObject = true;
+            AddComponent(physicsObjectComponent);
+
+            MoveableObjectComponent moveableObjectComponent = new MoveableObjectComponent();
+            moveableObjectComponent.MoveableObject = true;
+            AddComponent(moveableObjectComponent);
+
+            SpriteComponent spriteComponent = new SpriteComponent();
+            spriteComponent.assetsIndex = spriteIndex;
+            spriteComponent.spriteX = 0;
+            spriteComponent.spriteY = 0;
+            spriteComponent.spriteWidth = 27;
+            spriteComponent.spriteHeight = 21;
+            spriteComponent.spriteCol = 0;
+            spriteComponent.spriteRow = 0;
+            spriteComponent.spriteXDiff = 27;
+            spriteComponent.spriteYDiff = 21;
+            spriteComponent.speed = 100;
+            spriteComponent.facing = 1;
+            spriteComponent.animated = true;
+            AddComponent(spriteComponent);
         }
     }
 }
