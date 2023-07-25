@@ -44,7 +44,7 @@ namespace SDL_2_Test.engine
 
                     // Main Game Loop Functions Start
                     PollEvents();
-                    MainProgram.GameLoop();
+                    MainProgram.GameLoop(elapsed);
                     IntPtr state = SDL.SDL_GetKeyboardState(out size);
                     Marshal.Copy(state, Variables.KeyArray, 0, size);
                     Physics.Update(elapsed);
@@ -52,8 +52,6 @@ namespace SDL_2_Test.engine
                     Assets.Animate(elapsed);
                     Render();
                     // Main Game Loop Functions End
-
-
 
                     // Stop counting
                     sw.Stop();

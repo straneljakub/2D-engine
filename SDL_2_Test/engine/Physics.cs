@@ -83,13 +83,13 @@ namespace SDL_2_Test.engine
 
             if (isGrounded)
             {
-                entity.SetForce(new Vector(0, 9.8 * entity.GetMass()));
+                entity.SetForce(new Vector(0, Variables.GravitationalPull * entity.GetMass()));
                 entity.SetVelocity(0);
             }
             else
             {
 
-                var yForce = 9.8 * entity.GetMass();
+                var yForce = Variables.GravitationalPull * entity.GetMass();
                 if (force.y < yForce)
                 {
                     force.y += 40 * elapsed;
@@ -97,6 +97,13 @@ namespace SDL_2_Test.engine
                 else if (force.y > yForce)
                     force.y = yForce;
 
+                var xForce = 0;
+                if(force.x < xForce)
+                {
+                    force.x += 40 * elapsed;
+                } else if(force.x > xForce) {
+                    force.x -= 40 * elapsed;
+                }
                 entity.SetForce(force);
             }
 
@@ -115,8 +122,8 @@ namespace SDL_2_Test.engine
             float x;
             float y;
 
-            x = (float)(Math.Sign(force.x) * velocity * elapsed) * 20;  // 1m/s = 20px/s 
-            y = (float)(Math.Sign(force.y) * velocity * elapsed) * 20; // 1m/s = 20px/s 
+            x = (float)(Math.Sign(force.x) * velocity * elapsed) * Variables.Meter;  // 1m/s = 20px/s 
+            y = (float)(Math.Sign(force.y) * velocity * elapsed) * Variables.Meter; // 1m/s = 20px/s 
             entity.SetVelocity(velocity);
 
             var keyArray = Variables.KeyArray;
@@ -238,6 +245,7 @@ namespace SDL_2_Test.engine
                 {
                     var length = collider.GetBottom() - entity.GetTop();
                     entity.SetHitbox(0, length);
+                    entity.SetVelocity(0);
                 }
                 else //negative y
                 {

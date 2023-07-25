@@ -10,6 +10,8 @@ namespace SDL_2_Test
 {
     public static class MainProgram
     {
+        public static double Counting = 0;
+        public static int JumpSoundIndex = 3;
         public static void Init()
         {
             /*
@@ -101,10 +103,9 @@ namespace SDL_2_Test
                 //jump
                 if (keyArray[(int)SDL.SDL_Scancode.SDL_SCANCODE_UP] == 1 && isGrounded)
                 {
-                    entity.SetForce(0, (float)(entity.GetMass() * 9.8) * -10);
+                    entity.SetForce(0, (float)(entity.GetMass() * Variables.GravitationalPull) * -10);
                     entity.SetVelocity(40);
                     entity.SetHitbox(0, -1);
-                    Audio.PlayEffect(Assets.AssetsArray[3]);
                 }
                 if (keyArray[(int)SDL.SDL_Scancode.SDL_SCANCODE_ESCAPE] == 1)
                 {
@@ -166,11 +167,15 @@ namespace SDL_2_Test
             {
                 Variables.Running = false;
                 Level.LoadLevel(Variables.CurrentLevel);
+                Variables.Score = 0;
+                Variables.GameOver = true;
             }
             else if (entity.GetType() == typeof(Player) && collider.GetType() == typeof(Frog))
             {
                 Variables.Running = false;
+                Variables.Score = 0;
                 Level.LoadLevel(Variables.CurrentLevel);
+                Variables.GameOver = true;
             }
 
             return false;
@@ -202,7 +207,22 @@ namespace SDL_2_Test
                 player.SetSprite(sc);
             }
             
-            
+            var frog = EntityManager.GetAll<Frog>()[0];
+            grounded = frog.Grounded();
+            sc = frog.GetComponent<SpriteComponent>();
+
+            if (grounded)
+            {
+                sc.speed = 600;
+                sc.spriteRow = 0;
+                sc.spriteCol = (int)(SDL.SDL_GetTicks() / sc.speed) % 2;
+            } else
+            {
+                sc.speed = 200;
+                sc.spriteRow = 2;
+                sc.spriteCol = (int)(SDL.SDL_GetTicks() / sc.speed) % 2;
+            }
+
         }
 
         public static void MenuMouseInput(SDL.SDL_Event e)
@@ -222,8 +242,31 @@ namespace SDL_2_Test
             }
         }
 
-        public static void GameLoop()
+        public static void GameLoop(double elapsed)
         {
+            Counting += elapsed;
+            if(Counting > 2500000000)
+            {
+                Counting = 0;
+                var frog = EntityManager.GetAll<Frog>()[0];
+                if(frog.Grounded()) {
+                    var playerLeft = EntityManager.GetPlayer().GetLeft();
+                    var frogLeft = frog.GetLeft();
+                    if (playerLeft < frogLeft)
+                    {
+                        frog.SetFacing(0);
+                        frog.SetForce(-10, (float)(frog.GetMass() * Variables.GravitationalPull) * -10);
+                    } else
+                    {
+                        frog.SetFacing(1);
+                        frog.SetForce(10, (float)(frog.GetMass() * Variables.GravitationalPull) * -10);
+                    }
+                    frog.SetVelocity(40);
+                    frog.SetHitbox(0, -1);
+                    Audio.PlayEffect((Assets.AssetsArray[JumpSoundIndex]));
+                }
+            }
+            
 
         }
         public static void MenuLoop()
@@ -265,7 +308,7 @@ namespace SDL_2_Test
             AddComponent(massComponent);
 
             ForceComponent forceComponent = new ForceComponent();
-            forceComponent.Force = new Vector(0, 9.8 * 85);
+            forceComponent.Force = new Vector(0, Variables.GravitationalPull * 85);
             AddComponent(forceComponent);
 
             PhysicsObjectComponent physicsObjectComponent = new PhysicsObjectComponent();

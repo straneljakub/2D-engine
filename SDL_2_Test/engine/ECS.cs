@@ -443,7 +443,7 @@ namespace SDL_2_Test.engine
             AddComponent(massComponent);
 
             ForceComponent forceComponent = new ForceComponent();
-            forceComponent.Force = new Vector(0, 9.8 * 85);
+            forceComponent.Force = new Vector(0, Variables.GravitationalPull * 85);
             AddComponent(forceComponent);
 
             PhysicsObjectComponent physicsObjectComponent = new PhysicsObjectComponent();
@@ -543,7 +543,7 @@ namespace SDL_2_Test.engine
             AddComponent(hitboxComponent);
 
             ForceComponent forceComponent = new ForceComponent();
-            forceComponent.Force = new Vector(0, 9.8 * 0.3);
+            forceComponent.Force = new Vector(0, Variables.GravitationalPull * 0.3);
             AddComponent(forceComponent);
 
             VelocityComponent velocityComponent = new VelocityComponent();
@@ -601,65 +601,6 @@ namespace SDL_2_Test.engine
             sc.animated = false;
             sc.assetsIndex = spriteIndex;
             AddComponent(sc);
-        }
-    }
-
-    public class Frog : Entity
-    {
-        public Frog(int spriteIndex, int x, int y, int w, int h)
-        {
-            NameComponent nameComponent = new NameComponent();
-            nameComponent.Name = "Frog";
-            AddComponent(nameComponent);
-
-            SolidComponent solidComponent = new SolidComponent();
-            solidComponent.Solid = true;
-            AddComponent(solidComponent);
-
-            HitboxComponent hitboxComponent = new HitboxComponent();
-            hitboxComponent.Hitbox = new SDL.SDL_FRect
-            {
-                x = 300,
-                y = 200,
-                w = 81,
-                h = 63
-            };
-            AddComponent(hitboxComponent);
-
-            VelocityComponent velocityComponent = new VelocityComponent();
-            velocityComponent.Velocity = 0;
-            AddComponent(velocityComponent);
-
-            MassComponent massComponent = new MassComponent();
-            massComponent.Mass = 85;
-            AddComponent(massComponent);
-
-            ForceComponent forceComponent = new ForceComponent();
-            forceComponent.Force = new Vector(0, 9.8 * 85);
-            AddComponent(forceComponent);
-
-            PhysicsObjectComponent physicsObjectComponent = new PhysicsObjectComponent();
-            physicsObjectComponent.PhysicsObject = true;
-            AddComponent(physicsObjectComponent);
-
-            MoveableObjectComponent moveableObjectComponent = new MoveableObjectComponent();
-            moveableObjectComponent.MoveableObject = true;
-            AddComponent(moveableObjectComponent);
-
-            SpriteComponent spriteComponent = new SpriteComponent();
-            spriteComponent.assetsIndex = spriteIndex;
-            spriteComponent.spriteX = 0;
-            spriteComponent.spriteY = 0;
-            spriteComponent.spriteWidth = 27;
-            spriteComponent.spriteHeight = 21;
-            spriteComponent.spriteCol = 0;
-            spriteComponent.spriteRow = 0;
-            spriteComponent.spriteXDiff = 27;
-            spriteComponent.spriteYDiff = 21;
-            spriteComponent.speed = 350;
-            spriteComponent.facing = 1;
-            spriteComponent.animated = true;
-            AddComponent(spriteComponent);
         }
     }
 }

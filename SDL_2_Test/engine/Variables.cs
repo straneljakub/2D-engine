@@ -29,6 +29,9 @@ namespace SDL_2_Test.engine
         public static int PlayerSpeed = 350;
         public static int PlayerSpeedAir = 200;
 
+        public static int Meter = 20;
+        public static double GravitationalPull = 9.8;
+
         public static bool Running = false;
         public static bool Quit = false;
         // Nanoseconds
@@ -40,8 +43,6 @@ namespace SDL_2_Test.engine
         public static List<Entity> Entities = new List<Entity>();
 
 
-        // Last arrow key 0 = left, 1 = up, 2 = down, 3 = right
-        public static int LastArrow = -1;
 
         public static Random Random = new Random();
 
